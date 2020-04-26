@@ -1,0 +1,44 @@
+﻿body {
+    background-image: url("images/BackgroundSpace.jpg");
+    background-size: cover;
+}
+
+:root {
+    --code-space-darker-purple: #272057;
+    --code-space-gray-pruple: #483048;
+    --code-space-light-purple: #8850a0;
+    --code-space-black: #080828;
+    --code-space-blue: #283088;
+    --code-space-light-purple: #a088d8;
+}
+
+div .codespace-spacer {
+    margin-top: 10px;
+}
+
+.pointer {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
+
+.update-card{
+    margin: 10px;
+}
+
+.outer {
+    display: flex; /* Magic begins */
+    justify-content: center; /* Center contents */
+    margin: 0 auto;
+}
+
+.inner {
+    flex-shrink: 0; /* Don't shrink it even if it's too wide */
+    width: 110%;
+    padding-top: 1px;
+}
+
+.code-space-black {
+    background: var(--code-space-black);
+}
+

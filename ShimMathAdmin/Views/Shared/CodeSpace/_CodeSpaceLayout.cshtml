@@ -1,0 +1,39 @@
+﻿@model ShimMathAdmin.Models.CodeSpaceModels.CodeSpaceModel
+
+@{
+    ViewData["Title"] = "_CodeSpaceLayout";
+}
+
+    <link rel="stylesheet" type="text/css" href="~/css/code-space.css" />
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark rounded">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#codeSpaceNavbar" aria-controls="codeSpaceNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-md-center" id="codeSpaceNavbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index">Code Space Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Spaceships">My Spaceships</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Games">Active Games</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Community">Community Forum</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    @await Html.PartialAsync(Model.MainBodyView, Model)
+</div>
+
+@section Scripts{
+    <script src="~/lib/ckeditor-full/ckeditor.js"></script>
+    <script src="~/js/code-space.js"></script>
+}

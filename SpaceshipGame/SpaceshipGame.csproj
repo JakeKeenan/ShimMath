@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShimMath.DTO\ShimMath.DTO.csproj" />
+    <ProjectReference Include="..\ShimMathCore.BL\ShimMathCore.BL.csproj" />
+  </ItemGroup>
+
+</Project>
