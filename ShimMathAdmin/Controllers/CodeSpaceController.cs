@@ -25,7 +25,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult Updates()
         {
             CodeSpaceModel model = new CodeSpaceHomeModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -34,7 +34,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult Announcements()
         {
             CodeSpaceModel model = new CodeSpaceHomeModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -43,7 +43,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult About()
         {
             CodeSpaceModel model = new CodeSpaceHomeModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -52,7 +52,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult GettingStarted()
         {
             CodeSpaceModel model = new CodeSpaceHomeModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -61,7 +61,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult Spaceships()
         {
             CodeSpaceModel model = new CodeSpaceSpaceshipsModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -70,7 +70,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult Games()
         {
             CodeSpaceModel model = new CodeSpaceGamesModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 
@@ -79,7 +79,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult Community()
         {
             CodeSpaceModel model = new CodeSpaceCommunityModel();
-            ViewBag["PageUrl"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
+            ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
 

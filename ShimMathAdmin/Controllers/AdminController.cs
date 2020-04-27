@@ -1,39 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ShimMathAdmin.Models.AdminModels;
+﻿using ShimMathAdmin.Models.AdminModels;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using System.Text.RegularExpressions;
+using ShimMathAdmin.Models.CodeSpaceModels;
 
 namespace ShimMathAdmin.Controllers
 {
     public class AdminController : Controller
     {
-        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult EditText(AdminModel model, string newText, string elementID)
+        [HttpPost]
+        public IActionResult EditText(CodeSpaceHomeModel model, string newText, string elementID)
         {
-            try
+            string fileContent;
+            using (StreamReader streamReader = new StreamReader(model.MainBodyView))//needs actual file name, not just the path
             {
-                string fileContent;
-                using (StreamReader streamReader = new StreamReader(model.MainBodyView))
-                {
-                    fileContent = streamReader.ReadToEnd();
-                    streamReader.Close();
-                }
-
-                using (StreamWriter streamWriter = new StreamWriter(model.MainBodyView))
-                {
-
-                }
+                fileContent = streamReader.ReadToEnd();
+                streamReader.Close();
             }
-            catch
+            //<h1 id="WelcomeHeading">Welcome To Code Space</h1>
+            //\<([a-zA-Z1-9]*)\s.*id\s*=\s*\"editHeadExitOptions\"((.|\n)*?)\<\/\1>
+            //Match match = Regex.Match(fileContent, "\\<([a-zA-Z1-9]*)\\s.*id\\s*=\\s*\"" + elementID + "\\s*\"((.|\n)*?)\\<\\/\\1>");
+            //string modifiedContent = Regex.Replace(fileContent, "\\<.*id\\s*=\\s*\"" + elementID + "\".*\\>.*\\</.*\\>", "");
+            string modifiedContent = Regex.Replace(fileContent,
+                    "(?<startTag>\\<([a-zA-Z1-9]*)\\s.*id\\s*=\\s*\"" +
+                    elementID + "\\s*\".*?\\>)(?<middleContent>(.|\n)*?)(?<endTag>\\<\\/\\1>)",
+                    "${startTag}" + newText + "${endTag}");
+            using (StreamWriter streamWriter = new StreamWriter(model.MainBodyView))
             {
-                return StatusCode(500);
+                streamWriter.Write(modifiedContent);
+                streamWriter.Close();
             }
+
             return CreatedAtAction("EditText", elementID);
         }
 

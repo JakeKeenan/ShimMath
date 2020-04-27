@@ -30,7 +30,7 @@
 </nav>
 
 <div class="container">
-    @await Html.PartialAsync(Model.MainBodyView, Model)
+    @await Html.PartialAsync("/" + Model.MainBodyView, Model)
 </div>
 
 @section Scripts{

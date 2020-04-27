@@ -1,4 +1,4 @@
-﻿@model ShimMathAdmin.Models.CodeSpaceModels.CodeSpaceModel
+@model ShimMathAdmin.Models.CodeSpaceModels.CodeSpaceModel
 
 @{
     ViewData["Title"] = "CodeSpaceHome";
@@ -9,7 +9,7 @@
 <div class="jumbotron bg-dark text-light">
     <div style="display:flex; justify-content: center;">
         <div>
-            <h1 id="WelcomeHeading">Welcome To Code Space</h1>
+            <h1 id="WelcomeHeading">Welcome to Code Space</h1>
         </div>
         <div id="editHeadButton" href="#" class="text-light pointer" onclick="setTextEditor('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton')">
             <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 10px;">
@@ -20,13 +20,11 @@
         </div>
 
         <div id="editHeadExitOptions" style="display: none" class="ml-2">
-            <a class="d-block text-decoration-none text-light" asp-action="EditText">
-                <div id="editHeadSave" class="pointer">
-                    <svg class="bi bi-check" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-                        <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-            </a>
+            <div id="editHeadSave" class="pointer" onclick="saveChanges('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton', '@ViewBag.PageUrl')">
+                <svg class="bi bi-check" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                    <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd" />
+                </svg>
+            </div>
             <div id="editHeadDiscard" class="pointer" onclick="discardChanges('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton')">
                 <svg class="bi bi-x" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
                     <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd" />
@@ -38,7 +36,7 @@
 
     <div style="display:flex; justify-content: center;">
         <div>
-            <p class="lead text-center" id="WelcomeLead">Code your ship and compete for supremacy amongst the stars.<br> Code is the final frontier</p>
+            <p class="lead text-center" id="WelcomeLead">Code your ship and compete for supremacy amongst the stars.<br>​​​​​​​Code is the final frontier</p>
         </div>
         <div id="editLeadButton" href="#" class="text-light pointer" onclick="setTextEditor('WelcomeLead', 'editLeadExitOptions', 'editLeadButton')">
             <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 10px;">

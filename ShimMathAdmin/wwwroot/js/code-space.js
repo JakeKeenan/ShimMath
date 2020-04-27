@@ -36,6 +36,24 @@ function saveChanges(elementID, exitOptionsID, editButtonID, WebAPIUrl) {
     var jsonObject = {
         "EditedItem" : elementID, "NewText" : newTextString
     };
-    console.log(WebAPIUrl);
+    console.log(WebAPIUrl + "EditText?newText=somebull&elementID=WelcomeLead");
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+        }
+    };
+    newText = document.getElementById(elementID).innerHTML;
+    xhttp.open("POST", WebAPIUrl + "/EditText?newText=" + newText + "&elementID=" + elementID, true);
+    xhttp.send();
+    editor = editorDict[elementID][0];
+    OGContent = editorDict[elementID][1];
+    if (editor) {
+        editor.destroy();
+    }
+    document.getElementById(elementID).contentEditable = "false";
+    document.getElementById(editButtonID).style.display = "block";
+    document.getElementById(exitOptionsID).style.display = "none"
+
 
 }
