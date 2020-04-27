@@ -28,7 +28,7 @@ namespace SpaceshipGame
             foreach (Spaceship spaceship in Fleet)
             {
                 //make a thread for the spaceship, give the thread a spaceship object to modify at a rate.
-                spaceship.DecideCommand(new IdleCommand().Execute(spaceship));
+                //spaceship.DecideCommand(new IdleCommand().Execute(spaceship));
                 Captains.Add(new Thread(() => { }));
             }
         }
@@ -36,7 +36,7 @@ namespace SpaceshipGame
         {
             foreach (Spaceship spaceship in Fleet)
             {
-                spaceship.RunCommand();
+                //spaceship.RunCommand();
 
             }
         }
