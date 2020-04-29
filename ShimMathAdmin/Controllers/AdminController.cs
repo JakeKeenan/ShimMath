@@ -37,42 +37,8 @@ namespace ShimMathAdmin.Controllers
             return CreatedAtAction("EditText", elementID);
         }
 
-        public IActionResult EditTextGet(AdminModel model)
-        {
-            string fileText = "stuff";
-            string line  = "";
-            try
-            {
-                using (StreamReader sr = new StreamReader("Views/CodeSpace/CodeSpaceHome.cshtml"))
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        fileText += line;
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-
-            }
-            return CreatedAtAction("", new { id = 2}, line);
-        }
-
-
-        public IActionResult EditTextPut(AdminModel model)
-        {
-            return View();
-        }
-
-        [HttpPut]
-        [ActionName("EditPost")]
-        public IActionResult EditUpdate(AdminModel model, string updateName)
-        {
-            return View();
-        }
-
         [HttpPost]
-        [ActionName("CreatePost")]
+        [ActionName("CreateUpdate")]
         public IActionResult CreateUpdate(AdminModel model, string updateName)
         {
             return View();
