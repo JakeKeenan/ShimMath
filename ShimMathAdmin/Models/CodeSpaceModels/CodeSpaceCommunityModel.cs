@@ -9,7 +9,7 @@ namespace ShimMathAdmin.Models.CodeSpaceModels
     {
         public CodeSpaceCommunityModel()
         {
-            MainBodyView = "~/Views/CodeSpace/CodeSpaceCommunity.cshtml";
+            MainBodyView = "Views/CodeSpace/CodeSpaceCommunity.cshtml";
         }
     }
 }
