@@ -1,7 +1,7 @@
 ﻿
 window.onload = function () {
     editorDict = {};
-
+    this.setTextEditor("");
 }
 
 var editorDict;
