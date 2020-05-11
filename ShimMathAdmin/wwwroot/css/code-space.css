@@ -1,5 +1,6 @@
 ﻿body {
     background-image: url("images/BackgroundSpace.jpg");
+    background-attachment: fixed;
     background-size: cover;
 }
 

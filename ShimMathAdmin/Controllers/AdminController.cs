@@ -4,11 +4,14 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 using ShimMathAdmin.Models.CodeSpaceModels;
+using ShimMathCore.BL;
 
 namespace ShimMathAdmin.Controllers
 {
     public class AdminController : Controller
     {
+        private UserService userSvc;
+
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]

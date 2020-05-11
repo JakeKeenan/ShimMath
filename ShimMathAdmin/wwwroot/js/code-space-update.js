@@ -1,5 +1,1 @@
 ﻿
-function createUpdate(elementID)
-{
-
-}
