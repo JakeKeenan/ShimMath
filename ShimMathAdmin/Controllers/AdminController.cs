@@ -38,10 +38,11 @@ namespace ShimMathAdmin.Controllers
         }
 
         [HttpPost]
-        [ActionName("CreateUpdate")]
-        public IActionResult CreateUpdate(AdminModel model, string updateName)
+        [ActionName("Admin/Login")]
+        public IActionResult Login(AdminLoginModel model)
         {
-            return View();
+
         }
+
     }
 }

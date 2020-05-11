@@ -33,7 +33,10 @@ namespace ShimMathAdmin.Controllers
         [Route("CodeSpace/Home/Announcements")]
         public IActionResult Announcements()
         {
-            CodeSpaceModel model = new CodeSpaceHomeModel();
+            CodeSpaceModel model = new CodeSpaceHomeModel()
+            {
+                MainBodyView = "Views/CodeSpace/CodeSpaceHome/CodeSpaceAnnouncements.cshtml",
+            };
             ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);
         }
