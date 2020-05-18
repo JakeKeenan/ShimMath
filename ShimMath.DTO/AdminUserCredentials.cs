@@ -6,6 +6,7 @@ namespace ShimMath.DTO
 {
     public class AdminUserCredentials : UserCredentials
     {
+        public string EnteredSecretKey { get; set; }
         public static string SecretKey { get; set; }
     }
 }

@@ -126,6 +126,10 @@ namespace ShimMathCore.BL
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_PASSWORD;
                 }
+                else if (user.Username.Equals(UserConstants.SuperAdmin))
+                {
+                    if()
+                }
             }
 
             if (retVal.IsSuccessful)

@@ -10,5 +10,7 @@ namespace ShimMath.Constants
         public const int PasswordLength = 128;
 
         public const string PublicSalt = "ShimMath.com";
+
+        public const string SuperAdmin = "Huglow";
     }
 }
