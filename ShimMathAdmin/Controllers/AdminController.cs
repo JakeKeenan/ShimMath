@@ -4,21 +4,30 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 using ShimMathAdmin.Models.CodeSpaceModels;
+using Microsoft.Extensions.Logging;
 using ShimMathCore.BL;
+using System.Runtime.InteropServices.WindowsRuntime;
+using ShimMath.DTO;
 
 namespace ShimMathAdmin.Controllers
 {
     public class AdminController : Controller
     {
         private UserService userSvc;
+        private readonly ILogger<HomeController> _logger;
+
+        public AdminController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public IActionResult EditText(CodeSpaceHomeModel model, string newText, string elementID)
+        public IActionResult EditText(string newText, string oldText, string fileToEdit)//Change to take in file name to edit
         {
             string fileContent;
-            using (StreamReader streamReader = new StreamReader(model.MainBodyView))//needs actual file name, not just the path
+            using (StreamReader streamReader = new StreamReader(fileToEdit))//needs actual file name, not just the path
             {
                 fileContent = streamReader.ReadToEnd();
                 streamReader.Close();
@@ -28,23 +37,50 @@ namespace ShimMathAdmin.Controllers
             //Match match = Regex.Match(fileContent, "\\<([a-zA-Z1-9]*)\\s.*id\\s*=\\s*\"" + elementID + "\\s*\"((.|\n)*?)\\<\\/\\1>");
             //string modifiedContent = Regex.Replace(fileContent, "\\<.*id\\s*=\\s*\"" + elementID + "\".*\\>.*\\</.*\\>", "");
             string modifiedContent = Regex.Replace(fileContent,
-                    "(?<startTag>\\<([a-zA-Z1-9]*)\\s.*id\\s*=\\s*\"" +
-                    elementID + "\\s*\".*?\\>)(?<middleContent>(.|\n)*?)(?<endTag>\\<\\/\\1>)",
-                    "${startTag}" + newText + "${endTag}");
-            using (StreamWriter streamWriter = new StreamWriter(model.MainBodyView))
+                    oldText,
+                    newText);
+            using (StreamWriter streamWriter = new StreamWriter(fileToEdit))
             {
                 streamWriter.Write(modifiedContent);
                 streamWriter.Close();
             }
 
-            return CreatedAtAction("EditText", elementID);
+            return CreatedAtAction("EditText", oldText);
         }
 
-        [HttpPost]
+        [HttpGet]
         [ActionName("Admin/Login")]
-        public IActionResult Login(AdminLoginModel model)
+        public IActionResult Login()
+        {
+            return View("~/Views/Admin/Login.cshtml");
+        }
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost]
+        [ActionName("Admin/Register")]
+        public IActionResult Register(AdminRegisterModel model)
+        {
+            IActionResult retVal = new BadRequestResult();
+            AdminUserCredentials newAdminUser = new AdminUserCredentials()
+            {
+                Username = model.Username,
+                Password = model.Password,
+            };
+            AdminUserCredentials.SecretKey = "";
+            ReturnStatus returnStatus = userSvc.AddAdmin(newAdminUser);
+            if (returnStatus.IsSuccessful)
+            {
+                 retVal = CreatedAtAction("Register", model.Username);
+            }
+            return retVal;
+        }
+
+        [HttpGet]
+        public IActionResult testAPICall()
         {
 
+            return Json("hey");
         }
 
     }

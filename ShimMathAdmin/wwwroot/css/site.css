@@ -76,3 +76,60 @@ body {
 .secondary-nav {
     margin-top: 20px;
 }
+
+/*Login and register styles
+-------------------------------------------------- */
+.login-background {
+    object-position: 20% 70%;
+    background-image: url("images/BackgroundMathSteps.jpg");
+    background-size: cover;
+    width: 10vw;
+    flex-shrink: 0;
+}
+
+.register-background {
+    object-position: 20% 70%;
+    background-image: url("images/BackgroundMathSteps.jpg");
+    background-size: cover;
+    width: 10vw;
+    flex-shrink: 0;
+}
+
+.login-main {
+    flex-grow: 2;
+    display: flex;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+.register-main {
+    flex-grow: 2;
+    display: flex;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+#registerUserNamePassword {
+    display: none;
+}
+
+#registerEmail {
+
+}
+
+.login-subtext {
+    font-size: 0.8rem;
+}
+
+.pointer {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
+
+.backButton:hover {
+    transition-duration: 0.5s;
+    opacity: 0.6;
+}
+
+

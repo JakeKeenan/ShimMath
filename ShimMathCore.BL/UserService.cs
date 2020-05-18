@@ -15,6 +15,8 @@ namespace ShimMathCore.BL
         private UserRepo UserRepo;
         private List<UserCredentials> LoggedMembers;
         private List<AdminUserCredentials> LoggedAdmins;
+        //var list = new List<string>();
+        //var queryable = list.AsQueryable();
         string secretKey;
 
         public UserService(UserRepo userRepo)

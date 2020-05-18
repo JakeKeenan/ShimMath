@@ -1,4 +1,3 @@
 ﻿
-function createUpdate(elementID)
-{
-    
+function createUpdate(elementID) {
+}

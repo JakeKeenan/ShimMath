@@ -4,12 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ShimMathAdmin.Models.CodeSpaceModels;
 
 namespace ShimMathAdmin.Controllers
 {
     public class CodeSpaceController : AdminController
     {
+        public CodeSpaceController(ILogger<HomeController> logger) : base(logger)
+        {
+
+        }
+
         [HttpGet]
         [Route("CodeSpace")]
         public IActionResult Index()

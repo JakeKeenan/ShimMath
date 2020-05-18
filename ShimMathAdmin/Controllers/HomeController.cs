@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShimMathAdmin.Models;
+using ShimMathAdmin.Models.AdminModels;
 
 namespace ShimMathAdmin.Controllers
 {
@@ -20,7 +21,8 @@ namespace ShimMathAdmin.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            LayoutModel layoutModel = new LayoutModel();
+            return View(layoutModel);
         }
 
         public IActionResult Privacy()

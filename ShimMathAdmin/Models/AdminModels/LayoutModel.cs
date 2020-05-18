@@ -5,8 +5,13 @@ using System.Threading.Tasks;
 
 namespace ShimMathAdmin.Models.AdminModels
 {
-    public class AdminModel
+    public class LayoutModel
     {
         public string MainBodyView { get; set; }
+        public LayoutModel()
+        {
+            MainBodyView = "Views/Shared/CodeSpace/_Layout.cshtml";
+        }
+
     }
 }

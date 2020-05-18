@@ -7,11 +7,11 @@
 
 <div class="codespace-spacer"></div>
 <div class="jumbotron bg-dark text-light p-5 m-1">
-    <div style="display:flex; justify-content: center;">
-        <div>
-            <h1 id="WelcomeHeading">Welcome To CodeSpace</h1>
+    <div class="basic-editable-container" style="display:flex; justify-content: center;">
+        <div class="edit-target">
+            <h1>Welcome To CodeSpace</h1>
         </div>
-        <div id="editHeadButton" href="#" class="text-light pointer" onclick="setTextEditor('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton')">
+        <div class="edit-button text-light pointer">
             <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 10px;">
 
                 <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z" clip-rule="evenodd" />
@@ -19,13 +19,14 @@
             </svg>
         </div>
 
-        <div id="editHeadExitOptions" style="display: none" class="ml-2">
-            <div id="editHeadSave" class="pointer" onclick="saveChanges('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton', '@ViewBag.PageUrl')">
+        <div class="ml-2 edit-exit-buttons">
+            
+            <div class="edit-save pointer">
                 <svg class="bi bi-check" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
                     <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd" />
                 </svg>
             </div>
-            <div id="editHeadDiscard" class="pointer" onclick="discardChanges('WelcomeHeading', 'editHeadExitOptions', 'editHeadButton')">
+            <div class="edit-discard pointer">
                 <svg class="bi bi-x" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
                     <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd" />
@@ -34,11 +35,11 @@
         </div>
     </div>
 
-    <div style="display:flex; justify-content: center;">
-        <div>
+    <div class="basic-editable-container" style="display:flex; justify-content: center;">
+        <div class="edit-target">
             <p class="lead text-center" id="WelcomeLead">Code your ship and compete for supremacy amongst the stars.<br>​​​​​​​Code is the final frontier</p>
         </div>
-        <div id="editLeadButton" href="#" class="text-light pointer" onclick="setTextEditor('WelcomeLead', 'editLeadExitOptions', 'editLeadButton')">
+        <div class="edit-button text-light pointer">
             <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 10px;">
 
                 <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z" clip-rule="evenodd" />
@@ -46,20 +47,13 @@
             </svg>
         </div>
 
-        <div id="editLeadExitOptions" style="display: none" class="ml-2">
-            <!--<a class="d-block text-decoration-none text-light" asp-action="EditTextPut">
-                <div id="editLeadSave" class="pointer">
-                    <svg class="bi bi-check" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-                        <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-            </a>-->
-            <div id="editLeadSave" class="pointer" onclick="saveChanges('WelcomeLead', 'editLeadExitOptions', 'editLeadButton', '@ViewBag.PageUrl')">
+        <div class="ml-2 edit-exit-buttons">
+            <div class="edit-save pointer">
                 <svg class="bi bi-check" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
                     <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd" />
                 </svg>
             </div>
-            <div id="editLeadDiscard" class="pointer" onclick="discardChanges('WelcomeLead', 'editLeadExitOptions', 'editLeadButton')">
+            <div class="edit-discard pointer">
                 <svg class="bi bi-x" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
                     <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd" />
@@ -82,6 +76,9 @@
 
 @await Html.PartialAsync("~/Views/CodeSpace/CodeSpaceHome/CodeSpaceUpdates.cshtml", Model)
 
+<script>
+    var fileToEdit = "@Model.MainBodyView";
+</script>
 
 
 
