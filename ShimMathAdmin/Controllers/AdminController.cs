@@ -49,6 +49,16 @@ namespace ShimMathAdmin.Controllers
         }
 
         [HttpGet]
+        [ActionName("Admin/VerifyEmail")]
+        public IActionResult VerifyUserName(string userName)
+        {
+            //RedirectToAction();
+            ReturnStatus returnStatus = userSvc.IsUser(userName);
+
+            return Json("Json Obj");
+        }
+
+        [HttpGet]
         [ActionName("Admin/Login")]
         public IActionResult Login()
         {

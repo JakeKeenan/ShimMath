@@ -57,7 +57,7 @@ namespace ShimMathCore.BL
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_SECRET_KEY_NOT_POPULATED;
             }
-            else if(!hashPassword(AdminUserCredentials.SecretKey, UserConstants.PublicSalt).Equals(secretKey))
+            else if (!hashPassword(AdminUserCredentials.SecretKey, UserConstants.PublicSalt).Equals(secretKey))
             {
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_SECRET_KEY;
@@ -67,8 +67,9 @@ namespace ShimMathCore.BL
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
             }
-            else if (!UserRepo.AddAdmin(new UserCredentials() { 
-                Username = user.Username, 
+            else if (!UserRepo.AddAdmin(new UserCredentials()
+            {
+                Username = user.Username,
                 Password = keyEncryptPassword(user.Password)
             },
             generateSalt()))
@@ -79,13 +80,26 @@ namespace ShimMathCore.BL
             return null;
         }
 
+        public ReturnStatus IsUser(string userName)
+        {
+            ReturnStatus retVal = new ReturnStatus()
+            {
+                IsSuccessful = true,
+            };
+
+            retVal.IsSuccessful = false;
+            retVal.ErrorMessage = "Not implimented yet";
+
+            return retVal;
+        }
+
         public ReturnStatus LoginAdmin(AdminUserCredentials user)
         {
             ReturnStatus retVal = new ReturnStatus()
             {
                 IsSuccessful = true,
             };
-            
+
             if (string.IsNullOrEmpty(user.Username))
             {
                 retVal.IsSuccessful = false;
@@ -103,8 +117,15 @@ namespace ShimMathCore.BL
             }
             else if (string.IsNullOrEmpty(AdminUserCredentials.SecretKey))
             {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_SECRET_KEY;
+                if (user.Username.Equals(UserConstants.SuperAdmin))
+                {
+                    LoginSuperAdmin(user);
+                }
+                else
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_SECRET_KEY;
+                }
             }
             else if (UserRepo.IsNotAdmin(user))
             {
@@ -116,7 +137,12 @@ namespace ShimMathCore.BL
                 string salt = UserRepo.GetSalt(user);
                 string hashedPassword = hashPassword(user.Password, salt);
                 string encryptedPassword = UserRepo.GetEncryptedPassword(user);
-                if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(encryptedPassword))
+                if (string.IsNullOrEmpty(encryptedPassword))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
+                }
+                else if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(encryptedPassword))
                 {
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
@@ -126,15 +152,58 @@ namespace ShimMathCore.BL
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_PASSWORD;
                 }
-                else if (user.Username.Equals(UserConstants.SuperAdmin))
-                {
-                    if()
-                }
+
             }
 
             if (retVal.IsSuccessful)
             {
                 LoggedAdmins.Add(user);
+            }
+            return retVal;
+        }
+
+        private ReturnStatus LoginSuperAdmin(AdminUserCredentials user)
+        {
+            ReturnStatus retVal = new ReturnStatus()
+            {
+                IsSuccessful = true,
+            };
+            if (UserRepo.IsNotAdmin(user))
+            {
+                retVal.IsSuccessful = false;
+                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_PERMISSION;
+            }
+            else
+            {
+                secretKey = user.EnteredSecretKey;
+                string salt = UserRepo.GetSalt(user);
+                string hashedPassword = hashPassword(user.Password, salt);
+                string encryptedPassword = UserRepo.GetEncryptedPassword(user);
+                if (string.IsNullOrEmpty(encryptedPassword))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
+                }
+                else if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(encryptedPassword))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
+                }
+                else if (!string.Equals(keyDecryptPassword(encryptedPassword), hashedPassword))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_PASSWORD;
+                }
+
+            }
+
+            if (retVal.IsSuccessful)
+            {
+                LoggedAdmins.Add(user);
+            }
+            else
+            {
+                secretKey = "";
             }
             return retVal;
         }

@@ -13,6 +13,7 @@ namespace ShimMath.Constants
         public const string ERROR_WRONG_PASSWORD = "The Password you entered is wrong";
         public const string ERROR_NO_PERMISSION = "Your credentials are not sufficient";
         public const string ERROR_USERNAME_ALREADY_EXISTS = "The Username entered already exists";
+        public const string ERROR_COULD_NOT_GET_PASSWORD = "Could not access the password";
 
         public const string ERROR_COULD_NOT_CREATE_ADMIN = "Could not add requested user credentials";
 
