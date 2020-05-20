@@ -14,29 +14,35 @@ function HashPassword(unHashedPassword, publicSalt){
 }*/
 
 $(document).ready(function () {
+
+    checkExisistingUserEmails(emailInput){
+
+    };
+
     $('#nextRegisterForm').on('click', function () {
         emailInput = $('#emailInput').val();
 
         //var email = new RegExp('^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
         email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
         if (email_regex.test(emailInput)) {
-            $('#registerEmail').hide();
-            $('#registerUserNamePassword').show();
-            $('#registerUserNamePassword').css('display', 'flex');
-            $backButton = $('#backButton');
-            $backButton.addClass('pointer');
-            $backButton.addClass('backButton');
-            $backButton.children('.d-none').removeClass('d-none');
-            $backButton.on('click', function () {
-                $('#registerEmail').show();
-                $('#registerUserNamePassword').hide();
-                $('#registerUserNamePassword').css('display', 'none');
+            if (checkExisistingUserEmails(emailInput)) {
+                $('#registerEmail').hide();
+                $('#registerUserNamePassword').show();
+                $('#registerUserNamePassword').css('display', 'flex');
+                $backButton = $('#backButton');
+                $backButton.addClass('pointer');
+                $backButton.addClass('backButton');
+                $backButton.children('.d-none').removeClass('d-none');
+                $backButton.on('click', function () {
+                    $('#registerEmail').show();
+                    $('#registerUserNamePassword').hide();
+                    $('#registerUserNamePassword').css('display', 'none');
 
-                $(this).removeClass('pointer');
-                $(this).removeClass('backButton');
-                $(this).children().addClass('d-none');
-            });
-
+                    $(this).removeClass('pointer');
+                    $(this).removeClass('backButton');
+                    $(this).children().addClass('d-none');
+                });
+            }
 
         }
         else {
@@ -76,6 +82,14 @@ $(document).ready(function () {
         console.log(userNameInput);
         console.log(passwordInput);
         console.log(confirmedPasswordInput);
+        unHashedPassword = passwordInput;
+        publicSalt = 
+        function HashPassword(unHashedPassword, publicSalt) {
+            var md = forge.md.sha256.create();
+            md.update(unHashedPassword + publicSalt, 'utf8');
+            hashedPassword = md.digest().toHex()
+            //console.log(md.digest().toHex())
+        }
     })
 
     $('#password').focus(function () {
