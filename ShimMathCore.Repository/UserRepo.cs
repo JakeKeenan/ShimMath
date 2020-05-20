@@ -18,6 +18,16 @@ namespace ShimMathCore.Repository
             return "";
         }
 
+        public bool IsUsedEmail(string email)
+        {
+            return false;
+        }
+
+        public bool IsUsedUsername(string username)
+        {
+            return false;
+        }
+
         public bool IsNotAdmin(UserCredentials user)
         {
             return !IsAdmin(user);

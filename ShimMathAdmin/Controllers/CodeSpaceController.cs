@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShimMathAdmin.Models.CodeSpaceModels;
+using ShimMathCore.BL;
 
 namespace ShimMathAdmin.Controllers
 {
     public class CodeSpaceController : AdminController
     {
-        public CodeSpaceController(ILogger<HomeController> logger) : base(logger)
+        public CodeSpaceController(ILogger<HomeController> logger, UserService userService) : base(logger, userService)
         {
 
         }

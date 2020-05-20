@@ -7,16 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShimMathAdmin.Models;
 using ShimMathAdmin.Models.AdminModels;
+using ShimMathCore.BL;
 
 namespace ShimMathAdmin.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : AdminController
     {
-        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserService userService) : base(logger, userService)
         {
-            _logger = logger;
         }
 
         public IActionResult Index()

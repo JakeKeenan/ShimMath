@@ -99,14 +99,16 @@ body {
     flex-grow: 2;
     display: flex;
     justify-content: space-between;
-    height: 50vh;
+    /*height: 50vh;*/
+    /*height: auto;*/
 }
 
 .register-main {
     flex-grow: 2;
     display: flex;
     justify-content: space-between;
-    height: 50vh;
+    /*height: 50vh;*/
+    /*height: auto;*/
 }
 
 #registerUserNamePassword {

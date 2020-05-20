@@ -80,15 +80,28 @@ namespace ShimMathCore.BL
             return null;
         }
 
-        public ReturnStatus IsUser(string userName)
+        public ReturnStatus IsNotUser(string username = "", string email = "")
         {
             ReturnStatus retVal = new ReturnStatus()
             {
                 IsSuccessful = true,
             };
-
-            retVal.IsSuccessful = false;
-            retVal.ErrorMessage = "Not implimented yet";
+            if (string.IsNullOrEmpty(username) == false)
+            {
+                if (UserRepo.IsUsedUsername(username))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
+                }
+            }
+            else if (string.IsNullOrEmpty(email) == false)
+            {
+                if (UserRepo.IsUsedEmail(email))
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
+                }
+            }
 
             return retVal;
         }

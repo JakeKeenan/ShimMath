@@ -15,41 +15,99 @@ function HashPassword(unHashedPassword, publicSalt){
 
 $(document).ready(function () {
 
-    checkExisistingUserEmails(emailInput){
-
-    };
-
     $('#nextRegisterForm').on('click', function () {
         emailInput = $('#emailInput').val();
 
         //var email = new RegExp('^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
         email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
         if (email_regex.test(emailInput)) {
-            if (checkExisistingUserEmails(emailInput)) {
-                $('#registerEmail').hide();
-                $('#registerUserNamePassword').show();
-                $('#registerUserNamePassword').css('display', 'flex');
-                $backButton = $('#backButton');
-                $backButton.addClass('pointer');
-                $backButton.addClass('backButton');
-                $backButton.children('.d-none').removeClass('d-none');
-                $backButton.on('click', function () {
-                    $('#registerEmail').show();
-                    $('#registerUserNamePassword').hide();
-                    $('#registerUserNamePassword').css('display', 'none');
+            checkIsNotUsedEmail(emailInput,
+                function (errorMessage) {
+                    $('#invalidEmailMessege').removeClass('d-none');
+                    $('#invalidEmailMessege').html(errorMessage);
+                },
+                function () {
+                    $('#registerEmail').hide();
+                    $('#registerUserNamePassword').show();
+                    $('#registerUserNamePassword').css('display', 'flex');
+                    $backButton = $('#backButton');
+                    $backButton.addClass('pointer');
+                    $backButton.addClass('backButton');
+                    $backButton.children('.d-none').removeClass('d-none');
+                    $backButton.on('click', function () {
+                        $('#registerEmail').show();
+                        $('#registerUserNamePassword').hide();
+                        $('#registerUserNamePassword').css('display', 'none');
 
-                    $(this).removeClass('pointer');
-                    $(this).removeClass('backButton');
-                    $(this).children().addClass('d-none');
+                        $(this).removeClass('pointer');
+                        $(this).removeClass('backButton');
+                        $(this).children().addClass('d-none');
+                    });
                 });
-            }
-
         }
         else {
             $('#invalidEmailMessege').removeClass('d-none');
-
+            $('#invalidEmailMessege').html("You need a valid email to continue!");
         }
     });
+
+    $('#username').blur(function () {
+        usernameInput = $('#username').val();
+        if (usernameInput.length <= 4) {
+            $('#invalidUsernameMessage').removeClass('d-none');
+            $('#invalidUsernameMessege').html("Username must be longer than 3 characters");
+        }
+        else {
+            checkIsNotUsedUsername(usernameInput,
+                function (errorMessage) {
+                    $('#invalidUsernameMessage').removeClass('d-none');
+                    $('#invalidUsernameMessege').html(errorMessage);
+                },
+                function () {
+                    $('#invalidUsernameMessage').addClass('d-none');
+                });
+        }
+    });
+
+    function checkIsNotUsedUsername(usernameInput, responseFailResult, responseSuccessResult) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                returnStatus = JSON.parse(this.responseText);
+                if (returnStatus.isSuccessful == false) {
+                    responseFailResult(returnStatus.errorMessage);
+                }
+                else {
+                    responseSuccessResult();
+                }
+            }
+        }
+        var WebAPIUrl = window.location.href;
+        requestText = WebAPIUrl + "/IsNotUser?username=" + encodeURIComponent(usernameInput);
+        xhttp.open("GET", requestText, true);
+        xhttp.send();
+    }
+
+    function checkIsNotUsedEmail(emailInput, responseFailResult, responseSuccessResult) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            //console.log(this.status);
+            //console.log(this.readyState);
+            if (this.readyState == 4 && this.status == 200) {
+                returnStatus = JSON.parse(this.responseText);
+                if (returnStatus.isSuccessful == false) {
+                    responseFailResult(returnStatus.errorMessage);
+                }
+                else {
+                    responseSuccessResult();
+                }
+            }
+        };
+        var WebAPIUrl = window.location.href;
+        requestText = WebAPIUrl + "/IsNotUsedEmail?username=" + encodeURIComponent(emailInput);
+        xhttp.open("GET", requestText, true);
+        xhttp.send();
+    }
 
     $('#emailInput').keyup(function (e) {
         if (e.key == 'Enter') {
@@ -83,13 +141,13 @@ $(document).ready(function () {
         console.log(passwordInput);
         console.log(confirmedPasswordInput);
         unHashedPassword = passwordInput;
-        publicSalt = 
-        function HashPassword(unHashedPassword, publicSalt) {
-            var md = forge.md.sha256.create();
-            md.update(unHashedPassword + publicSalt, 'utf8');
-            hashedPassword = md.digest().toHex()
-            //console.log(md.digest().toHex())
-        }
+        publicSalt =
+            function HashPassword(unHashedPassword, publicSalt) {
+                var md = forge.md.sha256.create();
+                md.update(unHashedPassword + publicSalt, 'utf8');
+                hashedPassword = md.digest().toHex()
+                //console.log(md.digest().toHex())
+            }
     })
 
     $('#password').focus(function () {
@@ -100,7 +158,7 @@ $(document).ready(function () {
         if ($(this).val() == "") {
             $('#passwordRequirementsMessage').addClass('d-none');
         }
-        
+
     });
 
     $('#password').keyup(function () {

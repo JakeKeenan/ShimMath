@@ -14,11 +14,12 @@ namespace ShimMathAdmin.Controllers
     public class AdminController : Controller
     {
         private UserService userSvc;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> logger;
 
-        public AdminController(ILogger<HomeController> logger)
+        public AdminController(ILogger<HomeController> logger, UserService userService)
         {
-            _logger = logger;
+            userSvc = userService;
+            this.logger = logger;
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -48,18 +49,24 @@ namespace ShimMathAdmin.Controllers
             return CreatedAtAction("EditText", oldText);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
-        [ActionName("Admin/VerifyEmail")]
-        public IActionResult VerifyUserName(string userName)
+        public IActionResult IsNotUser(string username)
         {
             //RedirectToAction();
-            ReturnStatus returnStatus = userSvc.IsUser(userName);
+            ReturnStatus returnStatus = userSvc.IsNotUser(username: username);
 
-            returnStatus = new ReturnStatus()
-            {
-                IsSuccessful = true,
-                
-            };
+            return Json(returnStatus);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet]
+        public IActionResult IsNotUsedEmail(string email)        {
+            //RedirectToAction();
+            ReturnStatus returnStatus = userSvc.IsNotUser(email: email);
+
             return Json(returnStatus);
         }
 
