@@ -20,6 +20,7 @@ $(document).ready(function () {
         //var email = new RegExp('^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
         email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
         if (email_regex.test(emailInput)) {
+            
             $('#registerEmail').hide();
             $('#registerUserNamePassword').show();
             $('#registerUserNamePassword').css('display', 'flex');

@@ -55,7 +55,7 @@ namespace ShimMathAdmin.Controllers
             //RedirectToAction();
             ReturnStatus returnStatus = userSvc.IsUser(userName);
 
-            return Json("Json Obj");
+            return Json(returnStatus);
         }
 
         [HttpGet]
