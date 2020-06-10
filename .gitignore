@@ -341,3 +341,4 @@ healthchecksdb
 
 #Configure files to ignore
 *.appsettings
+/ShimMathAdmin/appsettings.json

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ShimMath.Constants\ShimMath.Constants.csproj" />
     <ProjectReference Include="..\ShimMath.DTO\ShimMath.DTO.csproj" />
     <ProjectReference Include="..\ShimMathCore.Repository\ShimMathCore.Repository.csproj" />
