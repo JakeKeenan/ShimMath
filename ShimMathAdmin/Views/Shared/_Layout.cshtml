@@ -22,7 +22,7 @@
 
                 <div class="navbar-collapse collapse" id="shimMathNavbar" style="">
                     <ul class="navbar-nav mr-auto">
-                        @if (Model.MainBodyView == "Views/Shared/CodeSpace/_Layout.cshtml")
+                        @if (Model.MainBodyView == "Views/Shared/_Layout.cshtml")
                         {
                             <li class="nav-item active">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
@@ -99,18 +99,18 @@
                                 <form class="ml-3 d-flex flex-column justify-content-around flex-grow-1">
                                     <div class="form-group">
                                         <label>User Name or Email</label>
-                                        <input type="password" class="form-control" placeholder="User Name or Email">
+                                        <input id="usernameOrEmailSignIn" type="password" class="form-control" placeholder="User Name or Email">
                                     </div>
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" class="form-control" placeholder="Password">
+                                        <input id="passwordSignIn" type="password" class="form-control" placeholder="Password">
                                         <div class="d-flex login-subtext">
                                             <a href="#" class="text-secondary">Forgot username</a>
                                             <p class="ml-1 mr-1"> &#8891; </p>
                                             <a href="#" class="text-secondary">Forgot password</a>
                                         </div>
 
-                                        <button type="submit" class="btn btn-primary">Login</button>
+                                        <button id="signIn" type="submit" class="btn btn-primary">Login</button>
 
                                     </div>
                                     <div class="flex-grow-1">
@@ -141,7 +141,7 @@
                         </div>
                         <div id="registerEmail" class="register-main modal-body clearfix">
                             <div class="mt-5 mb-5 ml-5 d-flex flex-column flex-grow-1 justify-content-around">
-                                <h1 class="modal-title flex-shrink-1 mb-1" id="exampleModalLongTitle">R&isin;gister@@&#8747;himM&Delta;th</h1>
+                                <h1 class="modal-title flex-shrink-1 mb-1" id="exampleModalLongTitle">R&isin;gister@@&#8747;himM&Delta;th (Admin)</h1>
 
                                 <div class="ml-3 mb-3 d-flex flex-column justify-content-around">
                                     <p style="width:400px;">With a ShimMath account you can compete and share in the Code Space community.</p>

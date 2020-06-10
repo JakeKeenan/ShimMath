@@ -6,19 +6,27 @@ using System.Text.RegularExpressions;
 using ShimMathAdmin.Models.CodeSpaceModels;
 using Microsoft.Extensions.Logging;
 using ShimMathCore.BL;
-using System.Runtime.InteropServices.WindowsRuntime;
 using ShimMath.DTO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace ShimMathAdmin.Controllers
 {
     public class AdminController : Controller
     {
-        private UserService userSvc;
+        protected UserService userSvc;
+        protected UserManager<IdentityUser> UserManager;
+        protected SignInManager<IdentityUser> SignInManager;
+
         private readonly ILogger<HomeController> logger;
 
-        public AdminController(ILogger<HomeController> logger, UserService userService)
+        public AdminController(ILogger<HomeController> logger, UserService userService,
+            UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             userSvc = userService;
+            UserManager = userManager;
+            SignInManager = signInManager;
             this.logger = logger;
         }
 
@@ -63,39 +71,63 @@ namespace ShimMathAdmin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
-        public IActionResult IsNotUsedEmail(string email)        {
+        public IActionResult IsNotUsedEmail(string email){
             //RedirectToAction();
             ReturnStatus returnStatus = userSvc.IsNotUser(email: email);
-
+            
             return Json(returnStatus);
-        }
-
-        [HttpGet]
-        [ActionName("Admin/Login")]
-        public IActionResult Login()
-        {
-            return View("~/Views/Admin/Login.cshtml");
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        [ActionName("Admin/Register")]
-        public IActionResult Register(AdminRegisterModel model)
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([FromBody] AdminLoginModel model)
         {
-            IActionResult retVal = new BadRequestResult();
-            AdminUserCredentials newAdminUser = new AdminUserCredentials()
+            IdentityResult result = new IdentityResult();
+            if (ModelState.IsValid)
             {
-                Username = model.Username,
-                Password = model.Password,
-            };
-            AdminUserCredentials.SecretKey = "";
-            ReturnStatus returnStatus = userSvc.AddAdmin(newAdminUser);
-            if (returnStatus.IsSuccessful)
-            {
-                 retVal = CreatedAtAction("Register", model.Username);
+                IdentityUser user = new IdentityUser
+                {
+                    
+                };
+                
             }
-            return retVal;
+
+            return Json(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register([FromBody] AdminRegisterModel model)
+        {
+            //Todo: move stuff to userService
+            IdentityResult result = new IdentityResult();
+            if (ModelState.IsValid)
+            {
+                IdentityUser user = new IdentityUser 
+                { 
+                    UserName = model.Username, Email = model.Email 
+                };
+                result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    //return RedirectToAction("index", "home");
+                }
+
+                foreach (IdentityError error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            return Json(result);
         }
 
         [HttpGet]
@@ -107,3 +139,24 @@ namespace ShimMathAdmin.Controllers
 
     }
 }
+
+/*
+ if (ModelState.IsValid)
+            {
+                IdentityUser user = new IdentityUser { UserName = model.Username, Email = model.Email };
+                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("index", "home");
+                }
+
+                foreach(IdentityError error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            return View(model);
+ */

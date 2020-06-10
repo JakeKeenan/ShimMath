@@ -9,7 +9,7 @@ namespace ShimMath.Constants
         //Passwords passed to ShimMath must be 128 characters exactly.
         public const int PasswordLength = 128;
 
-        public const string PublicSalt = "ShimMath.com";
+        public const string PublicSalt = "ShimMath";
 
         public const string SuperAdmin = "Huglow";
     }

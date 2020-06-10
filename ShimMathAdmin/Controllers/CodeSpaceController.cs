@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShimMathAdmin.Models.CodeSpaceModels;
 using ShimMathCore.BL;
+using ShimMathCore.Repository.Models;
 
 namespace ShimMathAdmin.Controllers
 {
     public class CodeSpaceController : AdminController
     {
-        public CodeSpaceController(ILogger<HomeController> logger, UserService userService) : base(logger, userService)
+        public CodeSpaceController(ILogger<HomeController> logger, UserService userService, 
+            UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) : 
+            base(logger, userService, userManager, signInManager)
         {
 
         }

@@ -74,6 +74,7 @@ $(document).ready(function () {
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 returnStatus = JSON.parse(this.responseText);
+
                 if (returnStatus.isSuccessful == false) {
                     responseFailResult(returnStatus.errorMessage);
                 }
@@ -83,6 +84,11 @@ $(document).ready(function () {
             }
         }
         var WebAPIUrl = window.location.href;
+        if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
+            //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
+            WebAPIUrl = WebAPIUrl + "Home";
+            console.log(WebAPIUrl);
+        }
         requestText = WebAPIUrl + "/IsNotUser?username=" + encodeURIComponent(usernameInput);
         xhttp.open("GET", requestText, true);
         xhttp.send();
@@ -91,11 +97,12 @@ $(document).ready(function () {
     function checkIsNotUsedEmail(emailInput, responseFailResult, responseSuccessResult) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            //console.log(this.status);
-            //console.log(this.readyState);
+            console.log(this.status);
+            console.log(this.readyState);
             if (this.readyState == 4 && this.status == 200) {
                 returnStatus = JSON.parse(this.responseText);
                 if (returnStatus.isSuccessful == false) {
+
                     responseFailResult(returnStatus.errorMessage);
                 }
                 else {
@@ -104,9 +111,32 @@ $(document).ready(function () {
             }
         };
         var WebAPIUrl = window.location.href;
-        requestText = WebAPIUrl + "/IsNotUsedEmail?username=" + encodeURIComponent(emailInput);
+        if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
+            //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
+            WebAPIUrl = WebAPIUrl + "Home";
+            console.log(WebAPIUrl);
+        }
+        requestText = WebAPIUrl + "/IsNotUsedEmail?email=" + encodeURIComponent(emailInput);
+        console.log(requestText);
         xhttp.open("GET", requestText, true);
         xhttp.send();
+    }
+
+    function registerAdmin(adminRegisterModel) {
+        var WebAPIUrl = window.location.href;
+        requestText = WebAPIUrl + "/Register";
+
+        $.ajax({
+            url: requestText,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(adminRegisterModel),
+            contentType: 'application/json; charset=utf-8',
+            success: function() {
+                var message = data.Message;
+                console.log(message);
+            }
+        });
     }
 
     $('#emailInput').keyup(function (e) {
@@ -115,10 +145,85 @@ $(document).ready(function () {
         }
     });
 
+    $('#signIn').on('click', function () {
+        console.log("signing in...");
+        usernameOrEmail = $('#usernameOrEmailSignIn').val();
+        passwordInput = $('#passwordSignIn').val();
+        unacceptablePassword = false;
+        unacceptableUsername = false;
+        unacceptableEmail = false;
+        // Validate lowercase letters
+        var lowerCaseLetters = /[a-z]/g;
+        if (!$password.val().match(lowerCaseLetters)) {
+            unacceptablePassword = true;
+        }
+
+        // Validate capital letters
+        var upperCaseLetters = /[A-Z]/g;
+        if (!$password.val().match(upperCaseLetters)) {
+            unacceptablePassword = true;
+        }
+
+        // Validate numbers
+        var numbers = /[0-9]/g;
+        if (!$password.val().match(numbers)) {
+            unacceptablePassword = true;
+        }
+
+        // Validate length
+        if (!$password.val().length >= 8) {
+            unacceptablePassword = true;
+        }
+
+        //Check Username/Email
+        email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+        if (usernameOrEmail.length <= 4 || !email_regex.test(usernameOrEmail)) {
+            unacceptableUsername = false;
+            unacceptableEmail = false;
+        }
+
+        if (unacceptablePassword) {
+            $('#incorrectPasswordResponse').removeClass('d-none');
+        }
+        else if (unacceptableUsername && unacceptableEmail) {
+            $('#incorrectEmailOrUsernameResponse').removeClass('d-none');
+        }
+            /*
+        else {
+            signInWasSuccessful = false;
+            if () {
+                signInWasSuccessful = signInUserWithEmail(usernameOrEmail, passwordInput);
+                if (signInWasSuccessful) {
+                    location.reload();
+                }
+                else (){
+                    $('#incorrectPasswordResponse').addClass('text-danger');
+                }
+            }
+            else if ( && !signInWasSuccessful) {
+                signInWasSuccessful = signInUserWithUserName(usernameOrEmail, passwordInput);
+                if (signInWasSuccessful) {
+                    location.reload();
+                }
+                else (){
+                    $('#incorrectPasswordResponse').addClass('text-danger');
+                }
+            }
+        }*/
+    })
+
+    function signInUserWithUsername(user, password) {
+
+    }
+
+    function signInUserWithEmail(email, password) {
+
+    }
+
     $('#registerNewUser').on('click', function () {
         console.log("registering...");
         userEmail = $('#emailInput').val();
-        userNameInput = $('#username').val();
+        usernameInput = $('#username').val();
         passwordInput = $('#password').val();
         confirmedPasswordInput = $('#passwordConfirm').val();
 
@@ -129,26 +234,41 @@ $(document).ready(function () {
             $('#invalidConfirmedPasswordMessege').addClass('d-none');
         }
 
-        if (userNameInput.length <= 4) {
+        if (usernameInput.length <= 4) {
             $('#invalidUserNameMessege').removeClass('d-none');
         }
         else {
             $('#invalidUserNameMessege').addClass('d-none');
         }
+        unHashedPassword = passwordInput;
+        publicSalt = model.publicSalt;
 
         console.log(userEmail);
-        console.log(userNameInput);
+        console.log(usernameInput);
         console.log(passwordInput);
         console.log(confirmedPasswordInput);
-        unHashedPassword = passwordInput;
-        publicSalt =
-            function HashPassword(unHashedPassword, publicSalt) {
-                var md = forge.md.sha256.create();
-                md.update(unHashedPassword + publicSalt, 'utf8');
-                hashedPassword = md.digest().toHex()
-                //console.log(md.digest().toHex())
-            }
-    })
+        console.log(publicSalt);
+
+        hashedPassword = HashPassword(unHashedPassword, publicSalt);
+        console.log(hashedPassword);
+
+        var adminRegisterModel = new Object();
+        adminRegisterModel.Username = usernameInput;
+        adminRegisterModel.Email = userEmail;
+        adminRegisterModel.Password = hashedPassword;
+        adminRegisterModel.EnteredSecretKey = 'aB22#@!#+Kl';
+
+        registerAdmin(adminRegisterModel)
+
+    });
+
+    function HashPassword(unHashedPassword, publicSalt) {
+        var md = forge.md.sha256.create();
+        md.update(unHashedPassword + publicSalt, 'utf8');
+        hashedPassword = md.digest().toHex()
+        //console.log(md.digest().toHex())
+        return hashedPassword;
+    }
 
     $('#password').focus(function () {
         $('#passwordRequirementsMessage').removeClass('d-none');

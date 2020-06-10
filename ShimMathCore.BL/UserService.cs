@@ -6,6 +6,12 @@ using System.Text;
 using ShimMath.Constants;
 using ShimMath.DTO;
 using ShimMathCore.Repository;
+//using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+//using Microsoft.AspNetCore.Identity.Owin;
+//using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace ShimMathCore.BL
@@ -14,17 +20,24 @@ namespace ShimMathCore.BL
     {
         private UserRepo UserRepo;
         private List<UserCredentials> LoggedMembers;
-        private List<AdminUserCredentials> LoggedAdmins;
+        private List<AdminUserCredentials> LoggedAdmins;// IEnumerable?
+
+        private UserManager<IdentityUser> UserManager;
+        private SignInManager<IdentityUser> SignInManager;
+
+        //private Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager;
+        //private Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager;
         //var list = new List<string>();
         //var queryable = list.AsQueryable();
-        string secretKey;
+        private string secretKey;
 
         public UserService(UserRepo userRepo)
         {
             UserRepo = userRepo;
-            //read secret key from file or somthing? TODO: Research ways
-            secretKey = "";
+            //this key is encrypted, it will not work
+            secretKey = ""; 
             LoggedMembers = new List<UserCredentials>();
+            LoggedAdmins = new List<AdminUserCredentials>();
         }
         public ReturnStatus AddAdmin(AdminUserCredentials user)
         {
@@ -32,6 +45,7 @@ namespace ShimMathCore.BL
             {
                 IsSuccessful = true,
             };
+            string generatedSalt = generateSalt();
             if (string.IsNullOrEmpty(user.Username))
             {
                 retVal.IsSuccessful = false;
@@ -47,7 +61,7 @@ namespace ShimMathCore.BL
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_PASSWORD_NOT_HASHED;
             }
-            else if (string.IsNullOrEmpty(AdminUserCredentials.SecretKey))
+            else if (string.IsNullOrEmpty(user.EnteredSecretKey))
             {
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_SECRET_KEY;
@@ -57,8 +71,9 @@ namespace ShimMathCore.BL
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_SECRET_KEY_NOT_POPULATED;
             }
-            else if (!hashPassword(AdminUserCredentials.SecretKey, UserConstants.PublicSalt).Equals(secretKey))
+            else if (!hashPassword(user.EnteredSecretKey, UserConstants.PublicSalt).Equals(secretKey))
             {
+                //string temp = hashPassword(secretKey, UserConstants.PublicSalt);
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_SECRET_KEY;
             }
@@ -70,14 +85,16 @@ namespace ShimMathCore.BL
             else if (!UserRepo.AddAdmin(new UserCredentials()
             {
                 Username = user.Username,
-                Password = keyEncryptPassword(user.Password)
+                UserEmail = user.UserEmail,
+                
+                Password = keyEncryptPassword(hashPassword(user.Password, generatedSalt))
             },
-            generateSalt()))
+            generatedSalt))
             {
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_CREATE_ADMIN;
             }
-            return null;
+            return retVal;
         }
 
         public ReturnStatus IsNotUser(string username = "", string email = "")
@@ -106,12 +123,35 @@ namespace ShimMathCore.BL
             return retVal;
         }
 
-        public ReturnStatus LoginAdmin(AdminUserCredentials user)
+        public async Task<ReturnStatus> LoginAdmin(AdminUserCredentials newAdminuser)
         {
+            /*
+            //IdentityResult result = new IdentityResult();
+            //IdentityUser user = new IdentityUser
+            {
+                UserName = newAdminuser.Username,
+                Email = newAdminuser.UserEmail
+            };
+            result = await UserManager.CreateAsync(user, newAdminuser.Password);
+
+            if (result.Succeeded)
+            {
+                await SignInManager.SignInAsync(user, isPersistent: false);
+                //return RedirectToAction("index", "home");
+            }
+            else
+            {
+
+            }
+
+            return new ReturnStatus();
+            /*
+
             ReturnStatus retVal = new ReturnStatus()
             {
                 IsSuccessful = true,
             };
+            bool loggedInSuperAdmin = false;
 
             if (string.IsNullOrEmpty(user.Username))
             {
@@ -128,16 +168,17 @@ namespace ShimMathCore.BL
                 retVal.IsSuccessful = false;
                 retVal.ErrorMessage = ErrorCodeConstants.ERROR_PASSWORD_NOT_HASHED;
             }
-            else if (string.IsNullOrEmpty(AdminUserCredentials.SecretKey))
+            else if (string.IsNullOrEmpty(secretKey))
             {
                 if (user.Username.Equals(UserConstants.SuperAdmin))
                 {
-                    LoginSuperAdmin(user);
+                    retVal = LoginSuperAdmin(user);
+                    loggedInSuperAdmin = retVal.IsSuccessful;
                 }
                 else
                 {
                     retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_SECRET_KEY;
+                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_SECRET_KEY_NOT_POPULATED;
                 }
             }
             else if (UserRepo.IsNotAdmin(user))
@@ -155,7 +196,7 @@ namespace ShimMathCore.BL
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
                 }
-                else if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(encryptedPassword))
+                else if (string.IsNullOrEmpty(salt))
                 {
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
@@ -168,11 +209,12 @@ namespace ShimMathCore.BL
 
             }
 
-            if (retVal.IsSuccessful)
+            if (retVal.IsSuccessful && !loggedInSuperAdmin)
             {
                 LoggedAdmins.Add(user);
             }
-            return retVal;
+            return retVal;*/
+            return null;
         }
 
         private ReturnStatus LoginSuperAdmin(AdminUserCredentials user)
@@ -188,7 +230,8 @@ namespace ShimMathCore.BL
             }
             else
             {
-                secretKey = user.EnteredSecretKey;
+                secretKey = hashPassword(user.EnteredSecretKey, UserConstants.PublicSalt);
+                //AdminUserCredentials.SecretKey = user.EnteredSecretKey;
                 string salt = UserRepo.GetSalt(user);
                 string hashedPassword = hashPassword(user.Password, salt);
                 string encryptedPassword = UserRepo.GetEncryptedPassword(user);
@@ -197,7 +240,7 @@ namespace ShimMathCore.BL
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
                 }
-                else if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(encryptedPassword))
+                else if (string.IsNullOrEmpty(salt))
                 {
                     retVal.IsSuccessful = false;
                     retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
@@ -276,16 +319,24 @@ namespace ShimMathCore.BL
         {
             return password.Length == UserConstants.PasswordLength;
         }
-
+        
         private string hashPassword(string password, string stringSalt)
         {
+            if(stringSalt.Length % 4 != 0)
+            {
+                for(int i = 0; i < stringSalt.Length % 4; i++)
+                {
+                    stringSalt += "=";
+                }
+            }
             byte[] salt = Convert.FromBase64String(stringSalt);
             return Convert.ToBase64String(KeyDerivation.Pbkdf2(
             password: password,
             salt: salt,
             prf: KeyDerivationPrf.HMACSHA256,
             iterationCount: 100000, //<- I read that 10,000 is 'so 2012.'
-            numBytesRequested: 256 / 8));
+            numBytesRequested: 16));
+            //return "";
         }
 
         private string generateSalt()
