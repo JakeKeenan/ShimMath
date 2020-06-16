@@ -83,13 +83,14 @@ $(document).ready(function () {
                 }
             }
         }
-        var WebAPIUrl = window.location.href;
-        if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
-            //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
-            WebAPIUrl = WebAPIUrl + "Home";
-            console.log(WebAPIUrl);
-        }
-        requestText = WebAPIUrl + "/IsNotUser?username=" + encodeURIComponent(usernameInput);
+        var WebAPIUrl = window.location.hostname;
+        console.log(WebAPIUrl);
+        //if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
+        //    //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
+        //    WebAPIUrl = WebAPIUrl + "Home";
+        //    console.log(WebAPIUrl);
+        //}
+        requestText = "/account/IsNotUsedUsername?username=" + encodeURIComponent(usernameInput);
         xhttp.open("GET", requestText, true);
         xhttp.send();
     }
@@ -110,31 +111,36 @@ $(document).ready(function () {
                 }
             }
         };
-        var WebAPIUrl = window.location.href;
-        if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
-            //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
-            WebAPIUrl = WebAPIUrl + "Home";
-            console.log(WebAPIUrl);
-        }
-        requestText = WebAPIUrl + "/IsNotUsedEmail?email=" + encodeURIComponent(emailInput);
+        var WebAPIUrl = window.location.hostname;
+        console.log(WebAPIUrl);
+        //if (WebAPIUrl.charAt(WebAPIUrl.length - 1) == '/') {
+        //    //WebAPIUrl = WebAPIUrl.substr(0, WebAPIUrl.length - 1);
+        //    WebAPIUrl = WebAPIUrl + "Home";
+        //    console.log(WebAPIUrl);
+        //}
+        requestText = "/account/IsNotUsedEmail?email=" + encodeURIComponent(emailInput);
         console.log(requestText);
         xhttp.open("GET", requestText, true);
         xhttp.send();
     }
 
-    function registerAdmin(adminRegisterModel) {
-        var WebAPIUrl = window.location.href;
-        requestText = WebAPIUrl + "/Register";
+    function register(RegisterModel) {
+        //var WebAPIUrl = window.location.href;
+        requestText = "account/Register";
 
         $.ajax({
             url: requestText,
             type: 'POST',
             dataType: 'json',
-            data: JSON.stringify(adminRegisterModel),
+            data: JSON.stringify(RegisterModel),
             contentType: 'application/json; charset=utf-8',
             success: function() {
                 var message = data.Message;
+                location.reload();
                 console.log(message);
+            },
+            error: function () {
+d                //console.log(message);
             }
         });
     }
@@ -250,15 +256,17 @@ $(document).ready(function () {
         console.log(publicSalt);
 
         hashedPassword = HashPassword(unHashedPassword, publicSalt);
+        hashedConfirmPassword = HashPassword(confirmedPasswordInput, publicSalt);
         console.log(hashedPassword);
 
-        var adminRegisterModel = new Object();
-        adminRegisterModel.Username = usernameInput;
-        adminRegisterModel.Email = userEmail;
-        adminRegisterModel.Password = hashedPassword;
-        adminRegisterModel.EnteredSecretKey = 'aB22#@!#+Kl';
+        var RegisterModel = new Object();
+        RegisterModel.Username = usernameInput;
+        RegisterModel.Email = userEmail;
+        RegisterModel.Password = hashedPassword;
+        RegisterModel.ConfirmPassword = hashedConfirmPassword;
 
-        registerAdmin(adminRegisterModel)
+
+        register(RegisterModel)
 
     });
 

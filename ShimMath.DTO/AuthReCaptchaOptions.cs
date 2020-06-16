@@ -4,8 +4,8 @@ using System.Text;
 
 namespace ShimMath.DTO
 {
-    public class AdminUserCredentials : UserCredentials
+    public class AuthReCaptchaOptions
     {
-        public string EnteredSecretKey { get; set; }
+        //key and username go here for reCAPTCHA api.
     }
 }

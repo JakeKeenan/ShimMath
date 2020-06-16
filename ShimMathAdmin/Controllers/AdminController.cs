@@ -16,17 +16,12 @@ namespace ShimMathAdmin.Controllers
     public class AdminController : Controller
     {
         protected UserService userSvc;
-        protected UserManager<IdentityUser> UserManager;
-        protected SignInManager<IdentityUser> SignInManager;
 
         private readonly ILogger<HomeController> logger;
 
-        public AdminController(ILogger<HomeController> logger, UserService userService,
-            UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AdminController(ILogger<HomeController> logger, UserService userService)
         {
             userSvc = userService;
-            UserManager = userManager;
-            SignInManager = signInManager;
             this.logger = logger;
         }
 
@@ -63,7 +58,7 @@ namespace ShimMathAdmin.Controllers
         public IActionResult IsNotUser(string username)
         {
             //RedirectToAction();
-            ReturnStatus returnStatus = userSvc.IsNotUser(username: username);
+           bool returnStatus = false;// = userSvc.IsNotUser(username);
 
             return Json(returnStatus);
         }
@@ -73,8 +68,9 @@ namespace ShimMathAdmin.Controllers
         [HttpGet]
         public IActionResult IsNotUsedEmail(string email){
             //RedirectToAction();
-            ReturnStatus returnStatus = userSvc.IsNotUser(email: email);
-            
+            //ReturnStatus returnStatus = userSvc.IsNotUser(email: email);
+            bool returnStatus = false;
+
             return Json(returnStatus);
         }
 
@@ -113,11 +109,11 @@ namespace ShimMathAdmin.Controllers
                 { 
                     UserName = model.Username, Email = model.Email 
                 };
-                result = await UserManager.CreateAsync(user, model.Password);
+                //result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    //await SignInManager.SignInAsync(user, isPersistent: false);
                     //return RedirectToAction("index", "home");
                 }
 

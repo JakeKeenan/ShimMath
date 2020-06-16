@@ -12,8 +12,6 @@ namespace ShimMathCore.Repository.Models
 {
     public class ShimMathContext : IdentityDbContext
     {
-        public DbSet<UserRole> userrole { get; set; }
-        public DbSet<User> user { get; set; }
         public ShimMathContext(DbContextOptions<ShimMathContext> options): base(options)
         {
 

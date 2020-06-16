@@ -14,9 +14,8 @@ namespace ShimMathAdmin.Controllers
 {
     public class CodeSpaceController : AdminController
     {
-        public CodeSpaceController(ILogger<HomeController> logger, UserService userService, 
-            UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) : 
-            base(logger, userService, userManager, signInManager)
+        public CodeSpaceController(ILogger<HomeController> logger, UserService userService) : 
+            base(logger, userService)
         {
 
         }
@@ -25,7 +24,6 @@ namespace ShimMathAdmin.Controllers
         [Route("CodeSpace")]
         public IActionResult Index()
         {
-             
             CodeSpaceModel model = new CodeSpaceHomeModel();
             ViewBag.PageUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{Request.Path}";
             return View("~/Views/Shared/CodeSpace/_CodeSpaceLayout.cshtml", model);

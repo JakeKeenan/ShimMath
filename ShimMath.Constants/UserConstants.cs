@@ -12,5 +12,7 @@ namespace ShimMath.Constants
         public const string PublicSalt = "ShimMath";
 
         public const string SuperAdmin = "Huglow";
+
+        public const string WebsiteEmailSender = "Hearan@ShimMath.com";
     }
 }

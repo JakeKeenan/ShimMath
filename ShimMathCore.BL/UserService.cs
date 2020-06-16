@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using ShimMath.Constants;
 using ShimMath.DTO;
 using ShimMathCore.Repository;
@@ -12,341 +9,243 @@ using ShimMathCore.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Policy;
 
 namespace ShimMathCore.BL
 {
     public class UserService
     {
-        private UserRepo UserRepo;
-        private List<UserCredentials> LoggedMembers;
-        private List<AdminUserCredentials> LoggedAdmins;// IEnumerable?
-
         private UserManager<IdentityUser> UserManager;
         private SignInManager<IdentityUser> SignInManager;
+        private EmailSenderService EmailSender;
 
-        //private Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager;
-        //private Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager;
-        //var list = new List<string>();
-        //var queryable = list.AsQueryable();
-        private string secretKey;
-
-        public UserService(UserRepo userRepo)
+        public UserService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, EmailSenderService emailSender)
         {
-            UserRepo = userRepo;
-            //this key is encrypted, it will not work
-            secretKey = ""; 
-            LoggedMembers = new List<UserCredentials>();
-            LoggedAdmins = new List<AdminUserCredentials>();
+            UserManager = userManager;
+            SignInManager = signInManager;
+            EmailSender = emailSender;
         }
-        public ReturnStatus AddAdmin(AdminUserCredentials user)
+        public async Task<bool> IsUsedUsernameAsync(string username)
         {
-            ReturnStatus retVal = new ReturnStatus()
-            {
-                IsSuccessful = true,
-            };
-            string generatedSalt = generateSalt();
-            if (string.IsNullOrEmpty(user.Username))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_USERNAME_ENTERED;
-            }
-            else if (string.IsNullOrEmpty(user.Password))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_PASSWORD_ENTERED;
-            }
-            else if (passwordDoesNotHaveCorrectFormat(user.Password))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_PASSWORD_NOT_HASHED;
-            }
-            else if (string.IsNullOrEmpty(user.EnteredSecretKey))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_SECRET_KEY;
-            }
-            else if (string.IsNullOrEmpty(secretKey))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_SECRET_KEY_NOT_POPULATED;
-            }
-            else if (!hashPassword(user.EnteredSecretKey, UserConstants.PublicSalt).Equals(secretKey))
-            {
-                //string temp = hashPassword(secretKey, UserConstants.PublicSalt);
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_SECRET_KEY;
-            }
-            else if (UserRepo.IsAdmin(user) || UserRepo.IsMember(user))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
-            }
-            else if (!UserRepo.AddAdmin(new UserCredentials()
-            {
-                Username = user.Username,
-                UserEmail = user.UserEmail,
-                
-                Password = keyEncryptPassword(hashPassword(user.Password, generatedSalt))
-            },
-            generatedSalt))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_CREATE_ADMIN;
-            }
-            return retVal;
-        }
-
-        public ReturnStatus IsNotUser(string username = "", string email = "")
-        {
-            ReturnStatus retVal = new ReturnStatus()
-            {
-                IsSuccessful = true,
-            };
+            bool retVal = true;
             if (string.IsNullOrEmpty(username) == false)
             {
-                if (UserRepo.IsUsedUsername(username))
+                if (await UserManager.FindByNameAsync(username) == null)
                 {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
+                    retVal = false;
                 }
             }
-            else if (string.IsNullOrEmpty(email) == false)
+            return retVal;
+        }
+
+        public async Task<bool> IsNotUsedUsernameAsync(string username)
+        {
+            bool retVal = await IsUsedUsernameAsync(username);
+            return !retVal;
+        }
+
+        public async Task<bool> IsUsedEmailAsync(string email)
+        {
+            bool retVal = true;
+            if (string.IsNullOrEmpty(email) == false)
             {
-                if (UserRepo.IsUsedEmail(email))
+                if (await UserManager.FindByEmailAsync(email) == null)
                 {
+                    retVal = false;
+                }
+            }
+            return retVal;
+        }
+
+        public async Task<bool> IsNotUsedEmailAsync(string email)
+        {
+            bool retVal = await IsUsedEmailAsync(email);
+            return !retVal;
+        }
+
+        public async Task<ReturnStatus> RegisterAsync(ShimMathUser newUser)
+        {
+            ReturnStatus retVal = new ReturnStatus()
+            {
+                IsSuccessful = true,
+                ErrorMessages = new List<string>(),
+            };
+            retVal = IsValidUserObject(newUser);
+
+            IdentityResult result = new IdentityResult();
+            if (retVal.IsSuccessful)
+            {
+                IdentityUser user = new IdentityUser
+                {
+                    UserName = newUser.Username,
+                    Email = newUser.Email
+                };
+                result = await UserManager.CreateAsync(user, newUser.Password);
+                
+                if (result.Succeeded == false)
+                {
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        retVal.ErrorMessages.Add(error.Description);
+                    }
                     retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USERNAME_ALREADY_EXISTS;
+                }
+                else
+                {
+                    result = await UserManager.SetLockoutEnabledAsync(user, false);
+                    if(result.Succeeded == false)
+                    {
+                        foreach(IdentityError error in result.Errors)
+                        {
+                            retVal.ErrorMessages.Add(error.Description);
+                        }
+                        retVal.IsSuccessful = false;
+                    }
                 }
             }
 
             return retVal;
         }
 
-        public async Task<ReturnStatus> LoginAdmin(AdminUserCredentials newAdminuser)
+        public async Task<string> GetVerificationCodeAsync(string emailAddress)
         {
-            /*
-            //IdentityResult result = new IdentityResult();
-            //IdentityUser user = new IdentityUser
+            string code = "";
+            IdentityUser user = await UserManager.FindByEmailAsync(emailAddress);
+            if (user == null)
             {
-                UserName = newAdminuser.Username,
-                Email = newAdminuser.UserEmail
-            };
-            result = await UserManager.CreateAsync(user, newAdminuser.Password);
-
-            if (result.Succeeded)
-            {
-                await SignInManager.SignInAsync(user, isPersistent: false);
-                //return RedirectToAction("index", "home");
+                code = null;
             }
             else
             {
-
+                code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             }
 
-            return new ReturnStatus();
-            /*
+            return code;
+        }
 
+        public async Task<ShimMathUser> GetUserByEmailAsync(string emailAdress)
+        {
+            IdentityUser identityUser = await UserManager.FindByEmailAsync(emailAdress);
+            ShimMathUser user = null;
+            if (identityUser != null)
+            {
+                user = new ShimMathUser()
+                {
+                    ID = identityUser.Id,
+                    Email = identityUser.Email,
+                    Username = identityUser.UserName,
+                    Password = null,
+                };
+            }
+            return user;
+        }
+
+        public async Task<ReturnStatus> SendVerificationEmailAsync(string emailAddress, string emailView)
+        {
             ReturnStatus retVal = new ReturnStatus()
             {
                 IsSuccessful = true,
+                ErrorMessages = new List<string>(),
             };
-            bool loggedInSuperAdmin = false;
 
-            if (string.IsNullOrEmpty(user.Username))
+            IdentityUser user = await UserManager.FindByEmailAsync(emailAddress);
+            if(user == null)
             {
                 retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_USERNAME_ENTERED;
+                retVal.ErrorMessages.Add(ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST);
             }
-            else if (string.IsNullOrEmpty(user.Password))
+            else
             {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_PASSWORD_ENTERED;
-            }
-            else if (passwordDoesNotHaveCorrectFormat(user.Password))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_PASSWORD_NOT_HASHED;
-            }
-            else if (string.IsNullOrEmpty(secretKey))
-            {
-                if (user.Username.Equals(UserConstants.SuperAdmin))
+                SendGrid.Response response = await EmailSender.SendEmailAsync(emailAddress, "Hello from ShimMath.com", html: emailView);
+                if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
                 {
-                    retVal = LoginSuperAdmin(user);
-                    loggedInSuperAdmin = retVal.IsSuccessful;
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessages.Add(ErrorCodeConstants.ERROR_VERIFICATION_EMAIL_SEND_FAILED);
+                }
+            }
+            return retVal;
+        }
+
+        public async Task<ReturnStatus> Login(ShimMathUser shimMathUser)
+        {
+            ReturnStatus retVal = new ReturnStatus()
+            {
+                IsSuccessful = true,
+                ErrorMessages = new List<string>(),
+            };
+
+            IdentityUser user = new IdentityUser
+            {
+                //Id = shimMathUser.ID,
+                UserName = shimMathUser.Username,
+                Email = shimMathUser.Email
+            };
+            Microsoft.AspNetCore.Identity.SignInResult result = await SignInManager.PasswordSignInAsync(user, shimMathUser.Password, false, false);
+            if (result.Succeeded == false)
+            {
+                if(result.IsLockedOut == true)
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessages.Add(ErrorCodeConstants.ERROR_ACCOUNT_IS_LOCKED);
+                }
+                else if (result.IsNotAllowed)
+                {
+                    retVal.IsSuccessful = false;
+                    retVal.ErrorMessages.Add(ErrorCodeConstants.ERROR_ACCOUNT_NOT_ALLOWED);
                 }
                 else
                 {
                     retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_SECRET_KEY_NOT_POPULATED;
+                    retVal.ErrorMessages.Add(ErrorCodeConstants.ERROR_WRONG_PASSWORD);
                 }
             }
-            else if (UserRepo.IsNotAdmin(user))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_PERMISSION;
-            }
-            else
-            {
-                string salt = UserRepo.GetSalt(user);
-                string hashedPassword = hashPassword(user.Password, salt);
-                string encryptedPassword = UserRepo.GetEncryptedPassword(user);
-                if (string.IsNullOrEmpty(encryptedPassword))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
-                }
-                else if (string.IsNullOrEmpty(salt))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
-                }
-                else if (!string.Equals(keyDecryptPassword(encryptedPassword), hashedPassword))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_PASSWORD;
-                }
-
-            }
-
-            if (retVal.IsSuccessful && !loggedInSuperAdmin)
-            {
-                LoggedAdmins.Add(user);
-            }
-            return retVal;*/
-            return null;
+            return retVal;
         }
 
-        private ReturnStatus LoginSuperAdmin(AdminUserCredentials user)
+        public async Task<ReturnStatus> Logout(ShimMathUser shimMathUser)
         {
             ReturnStatus retVal = new ReturnStatus()
             {
                 IsSuccessful = true,
             };
-            if (UserRepo.IsNotAdmin(user))
-            {
-                retVal.IsSuccessful = false;
-                retVal.ErrorMessage = ErrorCodeConstants.ERROR_NO_PERMISSION;
-            }
-            else
-            {
-                secretKey = hashPassword(user.EnteredSecretKey, UserConstants.PublicSalt);
-                //AdminUserCredentials.SecretKey = user.EnteredSecretKey;
-                string salt = UserRepo.GetSalt(user);
-                string hashedPassword = hashPassword(user.Password, salt);
-                string encryptedPassword = UserRepo.GetEncryptedPassword(user);
-                if (string.IsNullOrEmpty(encryptedPassword))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_COULD_NOT_GET_PASSWORD;
-                }
-                else if (string.IsNullOrEmpty(salt))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_USER_DOES_NOT_EXIST;
-                }
-                else if (!string.Equals(keyDecryptPassword(encryptedPassword), hashedPassword))
-                {
-                    retVal.IsSuccessful = false;
-                    retVal.ErrorMessage = ErrorCodeConstants.ERROR_WRONG_PASSWORD;
-                }
 
-            }
+            IdentityUser user = new IdentityUser
+            {
+                Id = shimMathUser.ID,
+                UserName = shimMathUser.Username,
+                Email = shimMathUser.Email,
+            };
+            //if (await SignInManager.IsSignedIn())
+            //{
 
-            if (retVal.IsSuccessful)
-            {
-                LoggedAdmins.Add(user);
-            }
-            else
-            {
-                secretKey = "";
-            }
+            //}
+            await SignInManager.SignOutAsync();
+            retVal.IsSuccessful = false;
+
             return retVal;
         }
 
-        private string keyDecryptPassword(string encryptedPassword)
+        
+
+        //returns ReturnStatus object with error message explaining why the user object is invalid
+        //error message is empty if the object is valid and IsSuccessful is true too.
+        private ReturnStatus IsValidUserObject(ShimMathUser user)
         {
-            byte[] iv = new byte[16];
-            byte[] buffer = Convert.FromBase64String(encryptedPassword);
-
-            using (Aes aes = Aes.Create())
+            ReturnStatus retVal = new ReturnStatus()
             {
-                aes.Key = Encoding.UTF8.GetBytes(secretKey);
-                aes.IV = iv;
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream(buffer))
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader streamReader = new StreamReader((Stream)cryptoStream))
-                        {
-                            return streamReader.ReadToEnd();
-                        }
-                    }
-                }
-            }
-        }
-
-        private string keyEncryptPassword(string password)
-        {
-            byte[] iv = new byte[16];
-            byte[] array;
-
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(secretKey);
-                aes.IV = iv;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
-                        {
-                            streamWriter.Write(password);
-                        }
-                        array = memoryStream.ToArray();
-                    }
-                }
-            }
-            return Convert.ToBase64String(array);
+                IsSuccessful = true,
+                ErrorMessages = new List<string>(),
+            };
+            passwordDoesNotHaveCorrectFormat(user.Password);
+            return retVal;
         }
 
         private bool passwordDoesNotHaveCorrectFormat(string password)
         {
             return password.Length == UserConstants.PasswordLength;
         }
-        
-        private string hashPassword(string password, string stringSalt)
-        {
-            if(stringSalt.Length % 4 != 0)
-            {
-                for(int i = 0; i < stringSalt.Length % 4; i++)
-                {
-                    stringSalt += "=";
-                }
-            }
-            byte[] salt = Convert.FromBase64String(stringSalt);
-            return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            password: password,
-            salt: salt,
-            prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 100000, //<- I read that 10,000 is 'so 2012.'
-            numBytesRequested: 16));
-            //return "";
-        }
 
-        private string generateSalt()
-        {
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-            return Convert.ToBase64String(salt);
-        }
     }
 }

@@ -14,6 +14,8 @@ using ShimMathCore.BL;
 using ShimMathCore.Repository.Models;
 using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using ShimMath.DTO;
 
 namespace ShimMathAdmin
 {
@@ -29,27 +31,32 @@ namespace ShimMathAdmin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDistributedMemoryCache();
-
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
-                //true if the cookie has the HttpOnly attribute and cannot be accessed through a client-side script; otherwise, false. 
-                //The default is false.
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true; 
-            });
-
             services.AddControllersWithViews();
 
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
+            services.AddScoped<EmailSenderService>();
             services.AddScoped<UserService>();
-            services.AddScoped<UserRepo>();
 
 
-            services.AddDbContextPool<ShimMathContext>(options => options.UseMySql(Configuration.GetConnectionString("ShimMathDB")));
-            services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ShimMathContext>();
+            services.AddDbContextPool<ShimMathContext>(options => options.UseMySql(Configuration["ShimMathAdmin:ConnectionString"]));
+            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.User.RequireUniqueEmail = true;
+                })
+                .AddEntityFrameworkStores<ShimMathContext>()
+                .AddDefaultTokenProviders();
+
+            
+            //services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>>();
+            /*
+            services.AddAuthorization(options =>
+                options.AddPolicy("TwoFactorEnabled",
+                x => x.RequireClaim("amr", "mfa")));
+            */
+
             //services.AddDefaultIdentity<IdentityUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ShimMathContext>();
 
@@ -75,13 +82,14 @@ namespace ShimMathAdmin
 
             app.UseAuthorization();
 
+
             app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}");
+                    pattern: "{controller=Home}/{action=Home}");
             });
         }
     }

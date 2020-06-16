@@ -16,5 +16,7 @@ namespace ShimMathAdmin.Models.AdminModels
             PublicSalt = UserConstants.PublicSalt;
         }
 
+        //public bool UserIsLoggedIn { get; set; }
+        //public string Username { get; set; }
     }
 }
