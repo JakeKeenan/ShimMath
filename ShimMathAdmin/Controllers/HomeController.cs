@@ -46,6 +46,7 @@ namespace ShimMathAdmin.Controllers
         public async Task<IActionResult> TestAction()
         {
             string email = "Huglowk@gmail.com";
+            string confirmationToken = "";
             VerifyEmailModel model = new VerifyEmailModel()
             {
                 ConfirmationUrl = await userSvc.GetVerificationCodeAsync(email),

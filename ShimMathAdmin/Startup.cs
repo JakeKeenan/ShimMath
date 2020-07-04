@@ -49,7 +49,6 @@ namespace ShimMathAdmin
                 .AddEntityFrameworkStores<ShimMathContext>()
                 .AddDefaultTokenProviders();
 
-            
             //services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>>();
             /*
             services.AddAuthorization(options =>
